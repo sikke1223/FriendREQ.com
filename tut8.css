@@ -1,0 +1,42 @@
+body
+{
+    margin: 0px;
+    padding: 0px;
+}
+.background
+{
+    width: 100%;
+    height: 100vh;
+    background-image: url(2nd.png);
+    background-repeat: repeat;
+    background-size: contain;
+    background-position: center;
+}
+body
+{
+    margin: 0px;
+    padding: 0px;
+}
+.background2
+{
+    width: 100%;
+    height: 100vh;
+    background-image: url(BG.jpg);
+    background-repeat: repeat;
+    background-size: contain;
+    background-position: center;
+}
+body
+{
+    margin: 0px;
+    padding: 0px;
+}
+.background3
+{
+    width: 100%;
+    height: 100vh;
+    background-image: url(BG.jpg);
+    background-repeat: repeat;
+    background-size: contain;
+    background-position: center;
+}
