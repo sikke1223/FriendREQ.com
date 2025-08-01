@@ -1,0 +1,32 @@
+🚀 MonkeyMoney Complete Application
+
+📁 Files in this workspace:
+- MonkeyMoney-Complete.html (Main application file)
+- COPY_THIS_CODE.txt (Complete code to copy)
+- index.html (Working version)
+
+📋 HOW TO GET THE CODE:
+
+Option 1: Copy from COPY_THIS_CODE.txt
+- Look for the file "COPY_THIS_CODE.txt" above
+- Copy everything between "START COPYING" and "STOP COPYING"
+- Paste in VS Code and save as index.html
+
+Option 2: If you can download files directly
+- Right-click on "MonkeyMoney-Complete.html" 
+- Select "Download" or "Save As"
+- Open in VS Code
+
+🔥 Your Firebase config is UNCHANGED:
+- apiKey: "AIzaSyDYiH8Mzcm0A8fOdNR_x12-FRPXpyqstHQ"
+- All your original settings preserved
+
+✅ Features included:
+- Complete admin dashboard
+- User registration with OTP
+- Deposit/withdrawal system  
+- Referral program with commissions
+- Monkey logo integrated throughout
+- Modern responsive design
+
+💡 Need help? Just ask me to explain any part!
