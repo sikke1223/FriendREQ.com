@@ -1,0 +1,1615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MonkeyMoney - Complete Earning Platform</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #6f42c1;
+            --secondary: #20c997;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+            min-height: 100vh;
+            padding-bottom: 50px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .navbar {
+            background: linear-gradient(135deg, var(--primary), #5a32a3);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card {
+            border-radius: 12px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+            border: none;
+            margin-bottom: 25px;
+            transition: all 0.3s ease;
+            overflow: hidden;
+            background: white;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 20px rgba(0, 0, 0, 0.12);
+        }
+        
+        .card-header {
+            font-weight: 600;
+            background: linear-gradient(135deg, var(--primary), #5a32a3);
+            color: white;
+            border-bottom: none;
+        }
+        
+        .balance-card {
+            background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+        }
+        
+        .deposit-card {
+            background: linear-gradient(135deg, #e0f7fa, #bbdefb);
+        }
+        
+        .withdraw-card {
+            background: linear-gradient(135deg, #fff3e0, #ffe0b2);
+        }
+        
+        .referral-card {
+            background: linear-gradient(135deg, #f5e6ff, #e9d4ff);
+        }
+        
+        .plan-card {
+            background: linear-gradient(135deg, #fff9f0, #ffecb3);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), #5a32a3);
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, var(--success), #1e7e34);
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+        
+        .btn-warning {
+            background: linear-gradient(135deg, var(--warning), #e0a800);
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .feature-icon {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            max-width: 350px;
+        }
+        
+        .dashboard-icon {
+            font-size: 1.8rem;
+            margin-right: 10px;
+            color: var(--primary);
+        }
+        
+        .transaction-table {
+            font-size: 0.9rem;
+        }
+        
+        .transaction-table th {
+            background-color: rgba(111, 66, 193, 0.1);
+        }
+        
+        .badge-pill {
+            border-radius: 20px;
+            padding: 5px 12px;
+            font-weight: 500;
+        }
+        
+        .admin-control-panel {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+        
+        .amount-display {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .plan-highlight {
+            border: 2px solid var(--primary);
+            transform: scale(1.05);
+            z-index: 10;
+        }
+        
+        .network-tree {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            min-height: 300px;
+            overflow: auto;
+        }
+        
+        .user-node {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 10px;
+            margin: 5px;
+            display: inline-block;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+        
+        /* OTP Verification Styles */
+        .otp-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        
+        .otp-input {
+            width: 50px;
+            height: 60px;
+            text-align: center;
+            font-size: 24px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            outline: none;
+            transition: all 0.3s;
+        }
+        
+        .otp-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 5px rgba(111, 66, 193, 0.5);
+        }
+        
+        .verification-card {
+            max-width: 500px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        
+        .countdown {
+            font-size: 1.2rem;
+            margin: 15px 0;
+            color: var(--primary);
+            font-weight: bold;
+        }
+        
+        /* Verification Status */
+        .verification-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 8px;
+            background-color: #f8f9fa;
+        }
+        
+        .status-icon {
+            font-size: 1.5rem;
+        }
+        
+        .status-verified {
+            color: var(--success);
+        }
+        
+        .status-pending {
+            color: var(--warning);
+        }
+        
+        /* Navigation Menu */
+        .app-menu {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+        
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .menu-item:hover {
+            background-color: rgba(111, 66, 193, 0.1);
+        }
+        
+        .menu-item.active {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .menu-item.active .menu-icon {
+            color: white;
+        }
+        
+        .menu-icon {
+            font-size: 1.2rem;
+            width: 30px;
+            color: var(--primary);
+        }
+        
+        /* Logo Styles */
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .logo-img {
+            height: 48px;
+            width: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .logo-img img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+        }
+        
+        .brand-text {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: white;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+        }
+        
+        /* Enhanced logo for auth page */
+        .auth-logo {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+        
+        .auth-logo .logo-img {
+            height: 80px;
+            width: 80px;
+            margin-right: 15px;
+        }
+        
+        .auth-logo .logo-img img {
+            width: 70px;
+            height: 70px;
+        }
+    </style>
+</head>
+<body>
+    <div class="loading-screen" id="loadingScreen">
+        <div class="text-center">
+            <div class="logo-container justify-content-center mb-4">
+                <div class="logo-img">
+                    <img src="https://img.icons8.com/color/48/monkey-with-a-banana.png" alt="MonkeyMoney Logo">
+                </div>
+            </div>
+            <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <h3 class="mt-3">Loading MonkeyMoney...</h3>
+            <p class="mt-2" id="loadingMessage">Initializing application</p>
+        </div>
+    </div>
+
+    <nav class="navbar navbar-expand-lg navbar-dark py-3">
+        <div class="container">
+            <a class="navbar-brand" href="#" onclick="showHome()">
+                <div class="logo-container">
+                    <div class="logo-img">
+                        <img src="https://img.icons8.com/color/48/monkey-with-a-banana.png" alt="MonkeyMoney Logo">
+                    </div>
+                    <span class="brand-text">MonkeyMoney</span>
+                </div>
+            </a>
+            <div id="userInfo" class="d-flex align-items-center text-white" style="display: none!important;">
+                <span class="me-3" id="userName"></span>
+                <button class="btn btn-sm btn-light" onclick="logout()">
+                    <i class="fas fa-sign-out-alt me-1"></i> Logout
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="notification" id="notificationArea"></div>
+
+    <div class="container py-4">
+        <div id="mainContent"></div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDYiH8Mzcm0A8fOdNR_x12-FRPXpyqstHQ",
+            authDomain: "monkeymoney-58778.firebaseapp.com",
+            projectId: "monkeymoney-58778",
+            storageBucket: "monkeymoney-58778.appspot.com",
+            messagingSenderId: "364864617201",
+            appId: "1:364864617201:web:b14eba15737401ca18c750",
+            measurementId: "G-K5HLVQLB0K"
+        };
+        
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+        
+        // Constants
+        const ADMIN_JAZZCASH = "03297487063";
+        const ADMIN_NAME = "Shahnawaz";
+        const PLAN_PRICE = 410;
+        const MIN_WITHDRAWAL = 1200;
+        const COMMISSION_RATE = 0.5;
+        const ADMIN_EMAIL = "monkeymoney017@gmail.com";
+        
+        // Global state
+        let currentTab = 'dashboard';
+        
+        // Initialize Data
+        async function initData() {
+            try {
+                document.getElementById("loadingMessage").textContent = "Checking admin account...";
+                const adminSnapshot = await db.collection('users').where('email', '==', ADMIN_EMAIL).get();
+                if (adminSnapshot.empty) {
+                    document.getElementById("loadingMessage").textContent = "Creating admin account...";
+                    await db.collection('users').add({
+                        name: "Admin",
+                        email: ADMIN_EMAIL,
+                        jazzcash: ADMIN_JAZZCASH,
+                        referral_code: "ADMIN001",
+                        referred_by: 0,
+                        balance: 0,
+                        wallet: 0,
+                        isAdmin: true,
+                        plan_purchased: true,
+                        network: [],
+                        phone: "",
+                        phoneVerified: false,
+                        emailVerified: false
+                    });
+                }
+            } catch (error) {
+                console.error("Error initializing data:", error);
+                showNotification("Error initializing app. Please check console for details.", "danger");
+            }
+        }
+        
+        // Notification System
+        function showNotification(message, type = "success") {
+            const notificationArea = document.getElementById("notificationArea");
+            const alert = document.createElement("div");
+            alert.className = `alert alert-${type} alert-dismissible fade show`;
+            alert.role = "alert";
+            alert.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            `;
+            notificationArea.appendChild(alert);
+            
+            setTimeout(() => {
+                alert.remove();
+            }, 5000);
+        }
+        
+        // OTP Functions
+        function generateOTP() {
+            return Math.floor(100000 + Math.random() * 900000);
+        }
+        
+        async function sendOTP(phone) {
+            const otp = generateOTP();
+            sessionStorage.setItem("otp", otp);
+            sessionStorage.setItem("otpPhone", phone);
+            
+            // In a real app, send OTP via SMS service
+            showNotification(`OTP sent to ${phone}: ${otp}`, "info");
+            return true;
+        }
+        
+        async function sendEmailOTP(email) {
+            const otp = generateOTP();
+            sessionStorage.setItem("emailOtp", otp);
+            sessionStorage.setItem("otpEmail", email);
+            
+            // In a real app, send OTP via email service
+            showNotification(`OTP sent to ${email}: ${otp}`, "info");
+            return true;
+        }
+        
+        function verifyOTP(enteredOtp) {
+            const storedOtp = sessionStorage.getItem("otp");
+            return enteredOtp === storedOtp;
+        }
+        
+        function verifyEmailOTP(enteredOtp) {
+            const storedOtp = sessionStorage.getItem("emailOtp");
+            return enteredOtp === storedOtp;
+        }
+        
+        // Login with OTP
+        async function requestLoginOTP() {
+            const phone = document.getElementById("loginPhone").value;
+            
+            if (!phone.match(/^03\d{9}$/)) {
+                showNotification("Please enter a valid Pakistani phone number (e.g. 03XXXXXXXXX)", "danger");
+                return;
+            }
+            
+            try {
+                // Check if phone exists
+                const phoneSnapshot = await db.collection('users').where('phone', '==', phone).get();
+                if (phoneSnapshot.empty) {
+                    showNotification("Phone number not registered", "danger");
+                    return;
+                }
+                
+                // Send OTP
+                await sendOTP(phone);
+                showOTPVerification(phone, "login");
+            } catch (error) {
+                showNotification("Error sending OTP: " + error.message, "danger");
+            }
+        }
+        
+        async function loginWithOTP() {
+            const otpInputs = document.querySelectorAll('.otp-input');
+            let otp = "";
+            otpInputs.forEach(input => {
+                otp += input.value;
+            });
+            
+            if (otp.length !== 6) {
+                showNotification("Please enter a complete 6-digit OTP", "danger");
+                return;
+            }
+            
+            if (!verifyOTP(otp)) {
+                showNotification("Invalid OTP. Please try again.", "danger");
+                return;
+            }
+            
+            const phone = sessionStorage.getItem("otpPhone");
+            try {
+                const userDoc = await db.collection('users').where('phone', '==', phone).get();
+                if (!userDoc.empty) {
+                    sessionStorage.setItem("currentUserId", userDoc.docs[0].id);
+                    showHome();
+                    showNotification("Login successful!");
+                }
+            } catch (error) {
+                showNotification("Login failed: " + error.message, "danger");
+            }
+        }
+        
+        // Registration with OTP
+        async function register() {
+            const name = document.getElementById("registerName").value;
+            const jazzcash = document.getElementById("jazzcashNumber").value;
+            const email = document.getElementById("registerEmail").value;
+            const phone = document.getElementById("registerPhone").value;
+            const referralCode = document.getElementById("referralCode").value;
+            
+            if (!phone.match(/^03\d{9}$/)) {
+                showNotification("Please enter a valid Pakistani phone number (e.g. 03XXXXXXXXX)", "danger");
+                return;
+            }
+            
+            try {
+                // Check if email exists
+                const emailSnapshot = await db.collection('users').where('email', '==', email).get();
+                if (!emailSnapshot.empty) {
+                    showNotification("Email already exists", "danger");
+                    return;
+                }
+                
+                // Check if phone exists
+                const phoneSnapshot = await db.collection('users').where('phone', '==', phone).get();
+                if (!phoneSnapshot.empty) {
+                    showNotification("Phone number already registered", "danger");
+                    return;
+                }
+                
+                // Handle referral
+                let referred_by = null;
+                if (referralCode) {
+                    const referrerSnapshot = await db.collection('users').where('referral_code', '==', referralCode).get();
+                    if (!referrerSnapshot.empty) {
+                        referred_by = referrerSnapshot.docs[0].id;
+                    }
+                }
+                
+                // Send OTP to phone and email
+                await sendOTP(phone);
+                await sendEmailOTP(email);
+                
+                // Store user data temporarily
+                sessionStorage.setItem("tempUser", JSON.stringify({
+                    name,
+                    jazzcash,
+                    email,
+                    phone,
+                    referral_code: generateReferralCode(),
+                    referred_by,
+                    balance: 0,
+                    wallet: 0,
+                    isAdmin: false,
+                    plan_purchased: false,
+                    network: [],
+                    uid: "",
+                    phoneVerified: false,
+                    emailVerified: false
+                }));
+                
+                // Show OTP verification screen
+                showOTPVerification(phone, "register");
+                
+            } catch (error) {
+                showNotification("Registration failed: " + error.message, "danger");
+            }
+        }
+        
+        async function completeRegistration() {
+            const otpInputs = document.querySelectorAll('.otp-input');
+            let otp = "";
+            otpInputs.forEach(input => {
+                otp += input.value;
+            });
+            
+            if (otp.length !== 6) {
+                showNotification("Please enter a complete 6-digit OTP", "danger");
+                return;
+            }
+            
+            if (!verifyOTP(otp)) {
+                showNotification("Invalid OTP. Please try again.", "danger");
+                return;
+            }
+            
+            const tempUser = JSON.parse(sessionStorage.getItem("tempUser"));
+            if (!tempUser) {
+                showNotification("Registration session expired. Please try again.", "danger");
+                return;
+            }
+            
+            try {
+                // Create user in Firestore
+                const userRef = await db.collection('users').add(tempUser);
+                
+                // Handle referral network
+                if (tempUser.referred_by) {
+                    await db.collection('users').doc(tempUser.referred_by).update({
+                        network: firebase.firestore.FieldValue.arrayUnion(userRef.id)
+                    });
+                }
+                
+                sessionStorage.setItem("currentUserId", userRef.id);
+                sessionStorage.removeItem("tempUser");
+                
+                // Mark phone as verified
+                await db.collection('users').doc(userRef.id).update({
+                    phoneVerified: true
+                });
+                
+                showNotification("Account created successfully! Please verify your email.");
+                showHome();
+            } catch (error) {
+                showNotification("Error completing registration: " + error.message, "danger");
+            }
+        }
+        
+        async function verifyEmail() {
+            const otpInputs = document.querySelectorAll('.email-otp-input');
+            let otp = "";
+            otpInputs.forEach(input => {
+                otp += input.value;
+            });
+            
+            if (otp.length !== 6) {
+                showNotification("Please enter a complete 6-digit OTP", "danger");
+                return;
+            }
+            
+            if (!verifyEmailOTP(otp)) {
+                showNotification("Invalid OTP. Please try again.", "danger");
+                return;
+            }
+            
+            const userId = sessionStorage.getItem("currentUserId");
+            if (!userId) {
+                showNotification("User not found. Please log in again.", "danger");
+                return;
+            }
+            
+            try {
+                await db.collection('users').doc(userId).update({
+                    emailVerified: true
+                });
+                
+                showNotification("Email verified successfully!");
+                showHome();
+            } catch (error) {
+                showNotification("Error verifying email: " + error.message, "danger");
+            }
+        }
+        
+        // Admin Functions
+        async function adminLogin() {
+            const username = document.getElementById("adminUsername").value;
+            const password = document.getElementById("adminPassword").value;
+            
+            try {
+                const userCredential = await auth.signInWithEmailAndPassword(username, password);
+                const userDoc = await db.collection('users').where('email', '==', username).get();
+                
+                if (!userDoc.empty) {
+                    sessionStorage.setItem("currentUserId", userDoc.docs[0].id);
+                    showHome();
+                    showNotification("Admin login successful!");
+                    
+                    // Close admin modal
+                    const adminModal = bootstrap.Modal.getInstance(document.getElementById('adminModal'));
+                    if (adminModal) adminModal.hide();
+                }
+            } catch (error) {
+                showNotification("Admin login failed: " + error.message, "danger");
+            }
+        }
+        
+        function logout() {
+            sessionStorage.removeItem("currentUserId");
+            sessionStorage.removeItem("otp");
+            sessionStorage.removeItem("otpPhone");
+            sessionStorage.removeItem("emailOtp");
+            sessionStorage.removeItem("otpEmail");
+            sessionStorage.removeItem("tempUser");
+            showHome();
+            showNotification("You have been logged out");
+        }
+        
+        // UI Functions
+        async function showHome() {
+            try {
+                const user = await getCurrentUser();
+                if (user) {
+                    if (user.isAdmin) {
+                        showAdminDashboard();
+                    } else {
+                        showUserDashboard();
+                    }
+                } else {
+                    showAuthPage();
+                }
+            } catch (error) {
+                showNotification("Error loading dashboard: " + error.message, "danger");
+                showAuthPage();
+            }
+        }
+        
+        async function getCurrentUser() {
+            const userId = sessionStorage.getItem("currentUserId");
+            if (!userId) return null;
+            
+            try {
+                const userDoc = await db.collection('users').doc(userId).get();
+                return userDoc.exists ? { id: userDoc.id, ...userDoc.data() } : null;
+            } catch (error) {
+                console.error("Error getting current user:", error);
+                return null;
+            }
+        }
+        
+        function showAuthPage() {
+            document.getElementById("userInfo").style.display = "none";
+            const mainContent = document.getElementById("mainContent");
+            mainContent.innerHTML = `
+                <div class="row justify-content-center">
+                    <div class="col-lg-8">
+                        <div class="text-center mb-5">
+                            <div class="logo-container justify-content-center mb-3 auth-logo">
+                                <div class="logo-img">
+                                    <img src="https://img.icons8.com/color/48/monkey-with-a-banana.png" alt="MonkeyMoney Logo">
+                                </div>
+                                <h1 class="text-primary">MonkeyMoney</h1>
+                            </div>
+                            <p class="lead text-muted">Network Marketing Platform</p>
+                        </div>
+                        
+                        <div class="card">
+                            <div class="card-body">
+                                <ul class="nav nav-tabs" id="authTabs" role="tablist">
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link active" id="login-tab" data-bs-toggle="tab" data-bs-target="#login" type="button">Login</button>
+                                    </li>
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link" id="register-tab" data-bs-toggle="tab" data-bs-target="#register" type="button">Register</button>
+                                    </li>
+                                </ul>
+                                
+                                <div class="tab-content py-4" id="authTabsContent">
+                                    <div class="tab-pane fade show active" id="login">
+                                        <form onsubmit="event.preventDefault(); requestLoginOTP();">
+                                            <div class="mb-3">
+                                                <label class="form-label">Phone Number</label>
+                                                <input type="text" id="loginPhone" class="form-control form-control-lg" placeholder="e.g. 03XXXXXXXXX" required>
+                                            </div>
+                                            <button type="submit" class="btn btn-primary btn-lg w-100 py-3">
+                                                <i class="fas fa-paper-plane me-2"></i> Send OTP
+                                            </button>
+                                        </form>
+                                    </div>
+                                    
+                                    <div class="tab-pane fade" id="register">
+                                        <form onsubmit="event.preventDefault(); register();">
+                                            <div class="mb-3">
+                                                <label class="form-label">Full Name</label>
+                                                <input type="text" id="registerName" class="form-control form-control-lg" placeholder="Enter your full name" required>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Phone Number</label>
+                                                <input type="text" id="registerPhone" class="form-control form-control-lg" placeholder="e.g. 03XXXXXXXXX" required>
+                                                <small class="text-muted">We'll send an OTP to verify your phone</small>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">JazzCash Number</label>
+                                                <input type="text" id="jazzcashNumber" class="form-control form-control-lg" placeholder="e.g. 03211234567" required>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Email</label>
+                                                <input type="email" id="registerEmail" class="form-control form-control-lg" placeholder="Enter your email" required>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Referral Code (Optional)</label>
+                                                <input type="text" id="referralCode" class="form-control form-control-lg" placeholder="Enter referral code">
+                                            </div>
+                                            <button type="submit" class="btn btn-success btn-lg w-100 py-3">
+                                                <i class="fas fa-user-plus me-2"></i> Create Account
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                                
+                                <div class="text-center mt-4">
+                                    <button class="btn btn-sm btn-outline-light" data-bs-toggle="modal" data-bs-target="#adminModal">
+                                        <i class="fas fa-lock me-1"></i> Admin Login
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function showOTPVerification(phone, type) {
+            const mainContent = document.getElementById("mainContent");
+            mainContent.innerHTML = `
+                <div class="row justify-content-center">
+                    <div class="col-md-6">
+                        <div class="card verification-card">
+                            <div class="card-header bg-primary text-white">
+                                <h4><i class="fas fa-mobile-alt me-2"></i> Phone Verification</h4>
+                            </div>
+                            <div class="card-body">
+                                <div class="alert alert-info">
+                                    We've sent a 6-digit verification code to your phone: 
+                                    <strong>${phone}</strong>. Please enter it below.
+                                </div>
+                                
+                                <div class="otp-container">
+                                    <input type="text" class="otp-input" maxlength="1" data-index="1">
+                                    <input type="text" class="otp-input" maxlength="1" data-index="2">
+                                    <input type="text" class="otp-input" maxlength="1" data-index="3">
+                                    <input type="text" class="otp-input" maxlength="1" data-index="4">
+                                    <input type="text" class="otp-input" maxlength="1" data-index="5">
+                                    <input type="text" class="otp-input" maxlength="1" data-index="6">
+                                </div>
+                                
+                                <div class="countdown" id="countdown">Resend OTP in 120 seconds</div>
+                                
+                                <button class="btn btn-primary w-100 py-2" onclick="${type === 'login' ? 'loginWithOTP()' : 'completeRegistration()'}">
+                                    <i class="fas fa-check-circle me-2"></i> Verify
+                                </button>
+                                
+                                <button class="btn btn-outline-secondary w-100 mt-2 py-2" id="resendBtn" disabled>
+                                    <i class="fas fa-redo me-2"></i> Resend OTP
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Start OTP countdown
+            startOTPTimer();
+            
+            // Setup OTP input auto-tab
+            const otpInputs = document.querySelectorAll('.otp-input');
+            otpInputs.forEach(input => {
+                input.addEventListener('input', function() {
+                    if (this.value.length === 1) {
+                        const nextIndex = parseInt(this.dataset.index) + 1;
+                        const nextInput = document.querySelector(`.otp-input[data-index="${nextIndex}"]`);
+                        if (nextInput) nextInput.focus();
+                    }
+                });
+            });
+        }
+        
+        function showEmailVerification() {
+            const email = sessionStorage.getItem("otpEmail");
+            const mainContent = document.getElementById("mainContent");
+            mainContent.innerHTML = `
+                <div class="row justify-content-center">
+                    <div class="col-md-6">
+                        <div class="card verification-card">
+                            <div class="card-header bg-primary text-white">
+                                <h4><i class="fas fa-envelope me-2"></i> Email Verification</h4>
+                            </div>
+                            <div class="card-body">
+                                <div class="alert alert-info">
+                                    We've sent a 6-digit verification code to your email: 
+                                    <strong>${email}</strong>. Please enter it below.
+                                </div>
+                                
+                                <div class="otp-container">
+                                    <input type="text" class="email-otp-input" maxlength="1" data-index="1">
+                                    <input type="text" class="email-otp-input" maxlength="1" data-index="2">
+                                    <input type="text" class="email-otp-input" maxlength="1" data-index="3">
+                                    <input type="text" class="email-otp-input" maxlength="1" data-index="4">
+                                    <input type="text" class="email-otp-input" maxlength="1" data-index="5">
+                                    <input type="text" class="email-otp-input" maxlength="1" data-index="6">
+                                </div>
+                                
+                                <div class="countdown" id="emailCountdown">Resend OTP in 120 seconds</div>
+                                
+                                <button class="btn btn-primary w-100 py-2" onclick="verifyEmail()">
+                                    <i class="fas fa-check-circle me-2"></i> Verify Email
+                                </button>
+                                
+                                <button class="btn btn-outline-secondary w-100 mt-2 py-2" id="resendEmailBtn" disabled>
+                                    <i class="fas fa-redo me-2"></i> Resend OTP
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Start OTP countdown
+            startEmailOTPTimer();
+            
+            // Setup OTP input auto-tab
+            const otpInputs = document.querySelectorAll('.email-otp-input');
+            otpInputs.forEach(input => {
+                input.addEventListener('input', function() {
+                    if (this.value.length === 1) {
+                        const nextIndex = parseInt(this.dataset.index) + 1;
+                        const nextInput = document.querySelector(`.email-otp-input[data-index="${nextIndex}"]`);
+                        if (nextInput) nextInput.focus();
+                    }
+                });
+            });
+        }
+        
+        function startOTPTimer() {
+            let timeLeft = 120;
+            const countdownEl = document.getElementById("countdown");
+            const resendBtn = document.getElementById("resendBtn");
+            
+            const timer = setInterval(() => {
+                timeLeft--;
+                countdownEl.textContent = `Resend OTP in ${timeLeft} seconds`;
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    countdownEl.textContent = "You can now resend OTP";
+                    resendBtn.disabled = false;
+                    resendBtn.onclick = () => {
+                        const phone = sessionStorage.getItem("otpPhone");
+                        if (phone) {
+                            sendOTP(phone);
+                            startOTPTimer();
+                            resendBtn.disabled = true;
+                        }
+                    };
+                }
+            }, 1000);
+        }
+        
+        function startEmailOTPTimer() {
+            let timeLeft = 120;
+            const countdownEl = document.getElementById("emailCountdown");
+            const resendBtn = document.getElementById("resendEmailBtn");
+            
+            const timer = setInterval(() => {
+                timeLeft--;
+                countdownEl.textContent = `Resend OTP in ${timeLeft} seconds`;
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    countdownEl.textContent = "You can now resend OTP";
+                    resendBtn.disabled = false;
+                    resendBtn.onclick = () => {
+                        const email = sessionStorage.getItem("otpEmail");
+                        if (email) {
+                            sendEmailOTP(email);
+                            startEmailOTPTimer();
+                            resendBtn.disabled = true;
+                        }
+                    };
+                }
+            }, 1000);
+        }
+        
+        // Navigation Menu
+        function renderMenu(activeTab) {
+            return `
+                <div class="app-menu">
+                    <div class="menu-item ${activeTab === 'dashboard' ? 'active' : ''}" onclick="showDashboardTab('dashboard')">
+                        <div class="menu-icon"><i class="fas fa-home"></i></div>
+                        <div>Dashboard</div>
+                    </div>
+                    <div class="menu-item ${activeTab === 'deposit' ? 'active' : ''}" onclick="showDashboardTab('deposit')">
+                        <div class="menu-icon"><i class="fas fa-money-bill-wave"></i></div>
+                        <div>Deposit</div>
+                    </div>
+                    <div class="menu-item ${activeTab === 'withdraw' ? 'active' : ''}" onclick="showDashboardTab('withdraw')">
+                        <div class="menu-icon"><i class="fas fa-wallet"></i></div>
+                        <div>Withdraw</div>
+                    </div>
+                    <div class="menu-item ${activeTab === 'referral' ? 'active' : ''}" onclick="showDashboardTab('referral')">
+                        <div class="menu-icon"><i class="fas fa-share-alt"></i></div>
+                        <div>Referral</div>
+                    </div>
+                    <div class="menu-item ${activeTab === 'transactions' ? 'active' : ''}" onclick="showDashboardTab('transactions')">
+                        <div class="menu-icon"><i class="fas fa-history"></i></div>
+                        <div>Transactions</div>
+                    </div>
+                    <div class="menu-item ${activeTab === 'verification' ? 'active' : ''}" onclick="showDashboardTab('verification')">
+                        <div class="menu-icon"><i class="fas fa-shield-alt"></i></div>
+                        <div>Verification</div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function showDashboardTab(tab) {
+            currentTab = tab;
+            showUserDashboard();
+        }
+        
+        async function showUserDashboard() {
+            const user = await getCurrentUser();
+            if (!user) return showAuthPage();
+            
+            document.getElementById("userInfo").style.display = "flex";
+            document.getElementById("userName").textContent = user.name;
+            
+            // Get user transactions
+            const depositsSnapshot = await db.collection('deposits')
+                .where('userId', '==', user.id)
+                .orderBy('date', 'desc')
+                .get();
+                
+            const withdrawalsSnapshot = await db.collection('withdrawals')
+                .where('userId', '==', user.id)
+                .orderBy('date', 'desc')
+                .get();
+                
+            const walletHistorySnapshot = await db.collection('wallet_history')
+                .where('userId', '==', user.id)
+                .orderBy('date', 'desc')
+                .get();
+            
+            const deposits = depositsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            const withdrawals = withdrawalsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            const walletHistory = walletHistorySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            
+            let content = '';
+            
+            // Render the menu
+            content += renderMenu(currentTab);
+            
+            // Render content based on current tab
+            switch(currentTab) {
+                case 'dashboard':
+                    content += `
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <div class="card balance-card">
+                                    <div class="card-body text-center">
+                                        <h3 class="text-success"><i class="fas fa-wallet dashboard-icon"></i> Your Balance</h3>
+                                        <div class="amount-display mt-3">Rs. ${user.balance.toFixed(2)}</div>
+                                        <p class="text-muted mt-2">Main balance</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6 mb-4">
+                                <div class="card referral-card">
+                                    <div class="card-body text-center">
+                                        <h3 class="text-primary"><i class="fas fa-money-bill-wave dashboard-icon"></i> Wallet Balance</h3>
+                                        <div class="amount-display mt-3">Rs. ${user.wallet.toFixed(2)}</div>
+                                        <p class="text-muted mt-2">Earnings from referrals</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        ${!user.plan_purchased ? `
+                            <div class="card plan-card">
+                                <div class="card-body text-center">
+                                    <h3 class="text-warning"><i class="fas fa-crown dashboard-icon"></i> Purchase Plan</h3>
+                                    <p>Activate your account to start earning from referrals</p>
+                                    <div class="amount-display">Rs. ${PLAN_PRICE}</div>
+                                    
+                                    <div class="mt-4">
+                                        <button class="btn btn-warning btn-lg py-3 w-100" onclick="showDashboardTab('deposit')">
+                                            <i class="fas fa-shopping-cart me-2"></i> Purchase Plan Now
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        ` : ''}
+                    `;
+                    break;
+                    
+                case 'deposit':
+                    content += `
+                        <div class="card deposit-card">
+                            <div class="card-body">
+                                <h4><i class="fas fa-money-bill-wave dashboard-icon"></i> Deposit Funds</h4>
+                                <div class="alert alert-info">
+                                    <strong>Deposit Instructions:</strong>
+                                    <ol class="mt-2">
+                                        <li>Send money to JazzCash: <strong>${ADMIN_JAZZCASH} (${ADMIN_NAME})</strong></li>
+                                        <li>Enter the transaction details below</li>
+                                        <li>Admin will approve your deposit within 24 hours</li>
+                                    </ol>
+                                </div>
+                                <form onsubmit="event.preventDefault(); depositFunds();">
+                                    <div class="mb-3">
+                                        <label class="form-label">Amount (Rs.)</label>
+                                        <input type="number" id="depositAmount" class="form-control form-control-lg" 
+                                               placeholder="Enter deposit amount" min="100" required>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label class="form-label">Transaction ID (Proof)</label>
+                                        <input type="text" id="transactionId" class="form-control form-control-lg" 
+                                               placeholder="Enter transaction ID from JazzCash" required>
+                                    </div>
+                                    
+                                    <button type="submit" class="btn btn-success btn-lg w-100 py-3">
+                                        <i class="fas fa-upload me-2"></i> Submit Deposit Request
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'withdraw':
+                    content += `
+                        <div class="card withdraw-card">
+                            <div class="card-body">
+                                <h4><i class="fas fa-money-check dashboard-icon"></i> Withdraw Funds</h4>
+                                <div class="alert alert-info">
+                                    Minimum withdrawal amount: <strong>Rs. ${MIN_WITHDRAWAL}</strong>
+                                </div>
+                                <form onsubmit="event.preventDefault(); requestWithdrawal();">
+                                    <div class="mb-3">
+                                        <label class="form-label">Amount (Rs.)</label>
+                                        <input type="number" id="withdrawAmount" class="form-control form-control-lg" 
+                                               placeholder="Minimum: ${MIN_WITHDRAWAL}" min="${MIN_WITHDRAWAL}" required>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label class="form-label">JazzCash Number</label>
+                                        <input type="text" id="withdrawAccount" class="form-control form-control-lg" 
+                                               value="${user.jazzcash || ''}" placeholder="Enter your JazzCash number" required>
+                                    </div>
+                                    
+                                    <button type="submit" class="btn btn-warning btn-lg w-100 py-3">
+                                        <i class="fas fa-paper-plane me-2"></i> Request Withdrawal
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'referral':
+                    content += `
+                        <div class="card referral-card">
+                            <div class="card-body">
+                                <h4><i class="fas fa-share-alt dashboard-icon"></i> Referral Program</h4>
+                                <p>Earn <strong>50%</strong> from each deposit your referrals make</p>
+                                
+                                <div class="input-group mb-3">
+                                    <input type="text" id="refLink" class="form-control" 
+                                           value="${window.location.href.split('?')[0]}?ref=${user.id}" 
+                                           readonly>
+                                    <button class="btn btn-primary" onclick="copyRefLink()">
+                                        <i class="fas fa-copy"></i> Copy
+                                    </button>
+                                </div>
+                                
+                                <button class="btn btn-outline-primary w-100" onclick="shareReferral()">
+                                    <i class="fas fa-share me-2"></i> Share via WhatsApp
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'transactions':
+                    content += `
+                        <div class="card">
+                            <div class="card-header">
+                                <h4><i class="fas fa-history dashboard-icon"></i> Transaction History</h4>
+                            </div>
+                            <div class="card-body">
+                                <ul class="nav nav-tabs" id="transactionTabs" role="tablist">
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link active" id="deposits-tab" data-bs-toggle="tab" data-bs-target="#deposits" type="button">Deposits</button>
+                                    </li>
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link" id="withdrawals-tab" data-bs-toggle="tab" data-bs-target="#withdrawals" type="button">Withdrawals</button>
+                                    </li>
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link" id="commissions-tab" data-bs-toggle="tab" data-bs-target="#commissions" type="button">Commissions</button>
+                                    </li>
+                                </ul>
+                                
+                                <div class="tab-content mt-3">
+                                    <div class="tab-pane fade show active" id="deposits">
+                                        ${deposits.length ? `
+                                            <div class="table-responsive">
+                                                <table class="table transaction-table">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Date</th>
+                                                            <th>Amount</th>
+                                                            <th>Transaction ID</th>
+                                                            <th>Status</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        ${deposits.map(deposit => `
+                                                            <tr>
+                                                                <td>${new Date(deposit.date).toLocaleDateString()}</td>
+                                                                <td>Rs. ${deposit.amount.toFixed(2)}</td>
+                                                                <td>${deposit.transactionId}</td>
+                                                                <td>
+                                                                    <span class="badge bg-${deposit.status === 'approved' ? 'success' : deposit.status === 'pending' ? 'warning' : 'danger'}">
+                                                                        ${deposit.status}
+                                                                    </span>
+                                                                </td>
+                                                            </tr>
+                                                        `).join('')}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        ` : `
+                                            <div class="text-center py-4">
+                                                <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                                                <p>No deposit history found</p>
+                                            </div>
+                                        `}
+                                    </div>
+                                    
+                                    <div class="tab-pane fade" id="withdrawals">
+                                        ${withdrawals.length ? `
+                                            <div class="table-responsive">
+                                                <table class="table transaction-table">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Date</th>
+                                                            <th>Amount</th>
+                                                            <th>Account</th>
+                                                            <th>Status</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        ${withdrawals.map(withdrawal => `
+                                                            <tr>
+                                                                <td>${new Date(withdrawal.date).toLocaleDateString()}</td>
+                                                                <td>Rs. ${withdrawal.amount.toFixed(2)}</td>
+                                                                <td>${withdrawal.account}</td>
+                                                                <td>
+                                                                    <span class="badge bg-${withdrawal.status === 'approved' ? 'success' : withdrawal.status === 'pending' ? 'warning' : 'danger'}">
+                                                                        ${withdrawal.status}
+                                                                    </span>
+                                                                </td>
+                                                            </tr>
+                                                        `).join('')}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        ` : `
+                                            <div class="text-center py-4">
+                                                <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                                                <p>No withdrawal history found</p>
+                                            </div>
+                                        `}
+                                    </div>
+                                    
+                                    <div class="tab-pane fade" id="commissions">
+                                        ${walletHistory.length ? `
+                                            <div class="table-responsive">
+                                                <table class="table transaction-table">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Date</th>
+                                                            <th>Amount</th>
+                                                            <th>From User</th>
+                                                            <th>Description</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        ${walletHistory.map(commission => `
+                                                            <tr>
+                                                                <td>${new Date(commission.date).toLocaleDateString()}</td>
+                                                                <td>Rs. ${commission.amount.toFixed(2)}</td>
+                                                                <td>${commission.from_user || 'System'}</td>
+                                                                <td>${commission.description}</td>
+                                                            </tr>
+                                                        `).join('')}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        ` : `
+                                            <div class="text-center py-4">
+                                                <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                                                <p>No commission history found</p>
+                                            </div>
+                                        `}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'verification':
+                    content += `
+                        <div class="card">
+                            <div class="card-header">
+                                <h4><i class="fas fa-shield-alt dashboard-icon"></i> Account Verification</h4>
+                            </div>
+                            <div class="card-body">
+                                <div class="verification-status">
+                                    <i class="fas fa-envelope status-icon ${user.emailVerified ? 'status-verified' : 'status-pending'}"></i>
+                                    <span>Email: ${user.emailVerified ? 'Verified' : 'Pending'}</span>
+                                    ${!user.emailVerified ? 
+                                        `<button class="btn btn-sm btn-outline-primary ms-2" onclick="sendEmailVerification('${user.email}')">Verify</button>` : 
+                                        ''}
+                                </div>
+                                <div class="verification-status">
+                                    <i class="fas fa-mobile-alt status-icon ${user.phoneVerified ? 'status-verified' : 'status-pending'}"></i>
+                                    <span>Phone: ${user.phoneVerified ? 'Verified' : 'Pending'}</span>
+                                    ${!user.phoneVerified ? 
+                                        `<button class="btn btn-sm btn-outline-primary ms-2" onclick="sendOTP('${user.phone}'); showOTPVerification('${user.phone}', 'verify')">Verify</button>` : 
+                                        ''}
+                                </div>
+                                
+                                ${!user.emailVerified ? `
+                                    <div class="mt-4">
+                                        <button class="btn btn-primary w-100" onclick="sendEmailVerification('${user.email}')">
+                                            <i class="fas fa-envelope me-2"></i> Send Email Verification
+                                        </button>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                    `;
+                    break;
+            }
+            
+            document.getElementById("mainContent").innerHTML = content;
+        }
+        
+        async function sendEmailVerification(email) {
+            await sendEmailOTP(email);
+            showEmailVerification();
+        }
+        
+        // Core Application Functions
+        async function depositFunds() {
+            const userId = sessionStorage.getItem("currentUserId");
+            if (!userId) return;
+            
+            const amount = parseFloat(document.getElementById("depositAmount").value);
+            const transactionId = document.getElementById("transactionId").value;
+            
+            if (amount < 100) {
+                showNotification("Minimum deposit amount is Rs. 100", "danger");
+                return;
+            }
+            
+            try {
+                await db.collection('deposits').add({
+                    userId,
+                    amount,
+                    transactionId,
+                    status: "pending",
+                    date: new Date().toISOString()
+                });
+                
+                showNotification("Deposit request submitted! Admin will approve it soon.");
+                document.getElementById("depositAmount").value = "";
+                document.getElementById("transactionId").value = "";
+            } catch (error) {
+                showNotification("Error submitting deposit: " + error.message, "danger");
+            }
+        }
+        
+        async function requestWithdrawal() {
+            const userId = sessionStorage.getItem("currentUserId");
+            if (!userId) return;
+            
+            const amount = parseFloat(document.getElementById("withdrawAmount").value);
+            const account = document.getElementById("withdrawAccount").value;
+            
+            try {
+                const userDoc = await db.collection('users').doc(userId).get();
+                const user = userDoc.data();
+                
+                if (!user.phoneVerified) {
+                    showNotification("Please verify your phone number before withdrawing", "danger");
+                    return;
+                }
+                
+                if (amount > user.wallet) {
+                    showNotification("Insufficient wallet balance", "danger");
+                    return;
+                }
+                
+                if (amount < MIN_WITHDRAWAL) {
+                    showNotification(`Minimum withdrawal amount is Rs. ${MIN_WITHDRAWAL}`, "danger");
+                    return;
+                }
+                
+                await db.collection('withdrawals').add({
+                    userId,
+                    amount,
+                    account,
+                    status: "pending",
+                    date: new Date().toISOString()
+                });
+                
+                showNotification("Withdrawal request submitted! Admin will process it soon.");
+                document.getElementById("withdrawAmount").value = "";
+            } catch (error) {
+                showNotification("Error submitting withdrawal: " + error.message, "danger");
+            }
+        }
+        
+        // Utility Functions
+        function copyRefLink() {
+            const refLink = document.getElementById("refLink");
+            refLink.select();
+            document.execCommand("copy");
+            showNotification("Referral link copied to clipboard!");
+        }
+        
+        function shareReferral() {
+            const refLink = document.getElementById("refLink").value;
+            const message = `Join MonkeyMoney and earn money with me! Use my referral link: ${refLink}`;
+            const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+            window.open(whatsappUrl, "_blank");
+        }
+        
+        function generateReferralCode() {
+            const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            let result = "";
+            for (let i = 0; i < 8; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return result;
+        }
+        
+        // Add admin dashboard function (placeholder - needs to be implemented)
+        async function showAdminDashboard() {
+            document.getElementById("userInfo").style.display = "flex";
+            document.getElementById("userName").textContent = "Admin";
+            
+            const mainContent = document.getElementById("mainContent");
+            mainContent.innerHTML = `
+                <div class="card">
+                    <div class="card-header">
+                        <h4><i class="fas fa-crown dashboard-icon"></i> Admin Dashboard</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-info">
+                            <h5>Admin Panel</h5>
+                            <p>Welcome to the admin dashboard. Here you can manage users, deposits, and withdrawals.</p>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <div class="card balance-card">
+                                    <div class="card-body text-center">
+                                        <h5>Total Users</h5>
+                                        <div class="amount-display">0</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="card deposit-card">
+                                    <div class="card-body text-center">
+                                        <h5>Pending Deposits</h5>
+                                        <div class="amount-display">0</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="card withdraw-card">
+                                    <div class="card-body text-center">
+                                        <h5>Pending Withdrawals</h5>
+                                        <div class="amount-display">0</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <p class="text-muted">Admin features are currently under development. Full admin panel will be available soon.</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Initialize the app
+        document.addEventListener("DOMContentLoaded", async () => {
+            try {
+                // Initialize Firebase
+                document.getElementById("loadingMessage").textContent = "Initializing Firebase...";
+                
+                // Set timeout to handle Firebase initialization failure
+                const loadingTimeout = setTimeout(() => {
+                    document.getElementById("loadingScreen").innerHTML = `
+                        <div class="text-center">
+                            <div class="logo-container justify-content-center mb-4">
+                                <div class="logo-img">
+                                    <img src="https://img.icons8.com/color/48/monkey-with-a-banana.png" alt="MonkeyMoney Logo">
+                                </div>
+                            </div>
+                            <h3 class="text-danger">Initialization Timeout</h3>
+                            <p>Firebase is taking too long to initialize. Please check your configuration.</p>
+                            <p>Make sure you've replaced the Firebase config with your own credentials.</p>
+                            <button class="btn btn-primary mt-3" onclick="location.reload()">Reload App</button>
+                        </div>
+                    `;
+                }, 10000); // 10 seconds timeout
+
+                // Check Firebase connection
+                document.getElementById("loadingMessage").textContent = "Connecting to Firebase...";
+                await db.collection('test').doc('test').get();
+                
+                // Initialize data
+                document.getElementById("loadingMessage").textContent = "Initializing data...";
+                await initData();
+                
+                // Firebase auth state listener
+                document.getElementById("loadingMessage").textContent = "Checking authentication...";
+                auth.onAuthStateChanged(async (user) => {
+                    clearTimeout(loadingTimeout);
+                    if (user) {
+                        // Find the user in Firestore
+                        document.getElementById("loadingMessage").textContent = "Loading user data...";
+                        const userDoc = await db.collection('users').where('email', '==', user.email).get();
+                        if (!userDoc.empty) {
+                            sessionStorage.setItem("currentUserId", userDoc.docs[0].id);
+                        }
+                    } else {
+                        sessionStorage.removeItem("currentUserId");
+                    }
+                    
+                    // Hide loading screen and show content
+                    document.getElementById("loadingScreen").style.display = "none";
+                    showHome();
+                });
+            } catch (error) {
+                console.error("App initialization failed:", error);
+                document.getElementById("loadingScreen").innerHTML = `
+                    <div class="text-center">
+                        <div class="logo-container justify-content-center mb-4">
+                            <div class="logo-img">
+                                <img src="https://img.icons8.com/color/48/monkey-with-a-banana.png" alt="MonkeyMoney Logo">
+                            </div>
+                        </div>
+                        <h3 class="text-danger">Initialization Error</h3>
+                        <p>${error.message}</p>
+                        <p>Please check your Firebase configuration.</p>
+                        <button class="btn btn-primary mt-3" onclick="location.reload()">Reload App</button>
+                    </div>
+                `;
+            }
+        });
+    </script>
+    
+    <div class="modal fade" id="adminModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Admin Login</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form onsubmit="event.preventDefault(); adminLogin();">
+                        <div class="mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email" id="adminUsername" class="form-control" placeholder="admin@monkeymoney.com" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Password</label>
+                            <input type="password" id="adminPassword" class="form-control" placeholder="Enter admin password" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-sign-in-alt me-2"></i> Login
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
