@@ -566,7 +566,17 @@
                 
                 // Handle referral
                 let referred_by = null;
-                if (referralCode) {
+                
+                // Check for referral from URL first, then from form
+                const urlReferralId = sessionStorage.getItem('referralId');
+                if (urlReferralId) {
+                    // Validate that the referral ID exists
+                    const referrerDoc = await db.collection('users').doc(urlReferralId).get();
+                    if (referrerDoc.exists) {
+                        referred_by = urlReferralId;
+                    }
+                    sessionStorage.removeItem('referralId'); // Clean up
+                } else if (referralCode) {
                     const referrerSnapshot = await db.collection('users').where('referral_code', '==', referralCode).get();
                     if (!referrerSnapshot.empty) {
                         referred_by = referrerSnapshot.docs[0].id;
@@ -1040,25 +1050,38 @@
             document.getElementById("userInfo").style.display = "flex";
             document.getElementById("userName").textContent = user.name;
             
-            // Get user transactions
-            const depositsSnapshot = await db.collection('deposits')
-                .where('userId', '==', user.id)
-                .orderBy('date', 'desc')
-                .get();
-                
-            const withdrawalsSnapshot = await db.collection('withdrawals')
-                .where('userId', '==', user.id)
-                .orderBy('date', 'desc')
-                .get();
-                
-            const walletHistorySnapshot = await db.collection('wallet_history')
-                .where('userId', '==', user.id)
-                .orderBy('date', 'desc')
-                .get();
+            // Get user transactions with error handling
+            let deposits = [], withdrawals = [], walletHistory = [];
             
-            const deposits = depositsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            const withdrawals = withdrawalsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            const walletHistory = walletHistorySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            try {
+                const depositsSnapshot = await db.collection('deposits')
+                    .where('userId', '==', user.id)
+                    .orderBy('date', 'desc')
+                    .get();
+                deposits = depositsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            } catch (error) {
+                console.log("No deposits collection or error:", error);
+            }
+            
+            try {
+                const withdrawalsSnapshot = await db.collection('withdrawals')
+                    .where('userId', '==', user.id)
+                    .orderBy('date', 'desc')
+                    .get();
+                withdrawals = withdrawalsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            } catch (error) {
+                console.log("No withdrawals collection or error:", error);
+            }
+            
+            try {
+                const walletHistorySnapshot = await db.collection('wallet_history')
+                    .where('userId', '==', user.id)
+                    .orderBy('date', 'desc')
+                    .get();
+                walletHistory = walletHistorySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            } catch (error) {
+                console.log("No wallet history collection or error:", error);
+            }
             
             let content = '';
             
@@ -1465,61 +1488,540 @@
             return result;
         }
         
-        // Add admin dashboard function (placeholder - needs to be implemented)
-        async function showAdminDashboard() {
-            document.getElementById("userInfo").style.display = "flex";
-            document.getElementById("userName").textContent = "Admin";
-            
-            const mainContent = document.getElementById("mainContent");
-            mainContent.innerHTML = `
-                <div class="card">
-                    <div class="card-header">
-                        <h4><i class="fas fa-crown dashboard-icon"></i> Admin Dashboard</h4>
+        // Admin Dashboard with full functionality
+        let adminCurrentTab = 'overview';
+        
+        function renderAdminMenu(activeTab) {
+            return `
+                <div class="app-menu">
+                    <div class="menu-item ${activeTab === 'overview' ? 'active' : ''}" onclick="showAdminTab('overview')">
+                        <div class="menu-icon"><i class="fas fa-chart-pie"></i></div>
+                        <div>Overview</div>
                     </div>
-                    <div class="card-body">
-                        <div class="alert alert-info">
-                            <h5>Admin Panel</h5>
-                            <p>Welcome to the admin dashboard. Here you can manage users, deposits, and withdrawals.</p>
-                        </div>
-                        
-                        <div class="row">
-                            <div class="col-md-4 mb-3">
-                                <div class="card balance-card">
-                                    <div class="card-body text-center">
-                                        <h5>Total Users</h5>
-                                        <div class="amount-display">0</div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                <div class="card deposit-card">
-                                    <div class="card-body text-center">
-                                        <h5>Pending Deposits</h5>
-                                        <div class="amount-display">0</div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                <div class="card withdraw-card">
-                                    <div class="card-body text-center">
-                                        <h5>Pending Withdrawals</h5>
-                                        <div class="amount-display">0</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="mt-4">
-                            <p class="text-muted">Admin features are currently under development. Full admin panel will be available soon.</p>
-                        </div>
+                    <div class="menu-item ${activeTab === 'deposits' ? 'active' : ''}" onclick="showAdminTab('deposits')">
+                        <div class="menu-icon"><i class="fas fa-money-bill-wave"></i></div>
+                        <div>Deposits</div>
+                    </div>
+                    <div class="menu-item ${activeTab === 'withdrawals' ? 'active' : ''}" onclick="showAdminTab('withdrawals')">
+                        <div class="menu-icon"><i class="fas fa-wallet"></i></div>
+                        <div>Withdrawals</div>
+                    </div>
+                    <div class="menu-item ${activeTab === 'users' ? 'active' : ''}" onclick="showAdminTab('users')">
+                        <div class="menu-icon"><i class="fas fa-users"></i></div>
+                        <div>Users</div>
+                    </div>
+                    <div class="menu-item ${activeTab === 'settings' ? 'active' : ''}" onclick="showAdminTab('settings')">
+                        <div class="menu-icon"><i class="fas fa-cog"></i></div>
+                        <div>Settings</div>
                     </div>
                 </div>
             `;
         }
         
+        function showAdminTab(tab) {
+            adminCurrentTab = tab;
+            showAdminDashboard();
+        }
+        
+        async function showAdminDashboard() {
+            document.getElementById("userInfo").style.display = "flex";
+            document.getElementById("userName").textContent = "Admin";
+            
+            // Get admin statistics with error handling
+            try {
+                let usersSnapshot, depositsSnapshot, withdrawalsSnapshot;
+                let totalUsers = 0, pendingDeposits = 0, pendingWithdrawals = 0;
+                let totalDeposits = 0, totalWithdrawals = 0;
+                
+                try {
+                    usersSnapshot = await db.collection('users').get();
+                    totalUsers = usersSnapshot.size;
+                } catch (error) {
+                    console.log("Error getting users:", error);
+                    usersSnapshot = { docs: [] };
+                }
+                
+                try {
+                    depositsSnapshot = await db.collection('deposits').get();
+                    pendingDeposits = depositsSnapshot.docs.filter(doc => doc.data().status === 'pending').length;
+                    totalDeposits = depositsSnapshot.docs.reduce((sum, doc) => sum + (doc.data().status === 'approved' ? doc.data().amount : 0), 0);
+                } catch (error) {
+                    console.log("Error getting deposits:", error);
+                    depositsSnapshot = { docs: [] };
+                }
+                
+                try {
+                    withdrawalsSnapshot = await db.collection('withdrawals').get();
+                    pendingWithdrawals = withdrawalsSnapshot.docs.filter(doc => doc.data().status === 'pending').length;
+                    totalWithdrawals = withdrawalsSnapshot.docs.reduce((sum, doc) => sum + (doc.data().status === 'approved' ? doc.data().amount : 0), 0);
+                } catch (error) {
+                    console.log("Error getting withdrawals:", error);
+                    withdrawalsSnapshot = { docs: [] };
+                }
+                
+                let content = '';
+                content += renderAdminMenu(adminCurrentTab);
+                
+                switch(adminCurrentTab) {
+                    case 'overview':
+                        content += `
+                            <div class="row">
+                                <div class="col-md-3 mb-4">
+                                    <div class="card balance-card">
+                                        <div class="card-body text-center">
+                                            <h5><i class="fas fa-users dashboard-icon"></i>Total Users</h5>
+                                            <div class="amount-display">${totalUsers}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 mb-4">
+                                    <div class="card deposit-card">
+                                        <div class="card-body text-center">
+                                            <h5><i class="fas fa-clock dashboard-icon"></i>Pending Deposits</h5>
+                                            <div class="amount-display">${pendingDeposits}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 mb-4">
+                                    <div class="card withdraw-card">
+                                        <div class="card-body text-center">
+                                            <h5><i class="fas fa-hourglass dashboard-icon"></i>Pending Withdrawals</h5>
+                                            <div class="amount-display">${pendingWithdrawals}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 mb-4">
+                                    <div class="card referral-card">
+                                        <div class="card-body text-center">
+                                            <h5><i class="fas fa-chart-line dashboard-icon"></i>Revenue</h5>
+                                            <div class="amount-display">Rs. ${(totalDeposits - totalWithdrawals).toFixed(2)}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-4">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h5><i class="fas fa-chart-bar me-2"></i>Financial Summary</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="row">
+                                                <div class="col-6">
+                                                    <p><strong>Total Deposits:</strong></p>
+                                                    <h4 class="text-success">Rs. ${totalDeposits.toFixed(2)}</h4>
+                                                </div>
+                                                <div class="col-6">
+                                                    <p><strong>Total Withdrawals:</strong></p>
+                                                    <h4 class="text-danger">Rs. ${totalWithdrawals.toFixed(2)}</h4>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-4">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h5><i class="fas fa-tasks me-2"></i>Quick Actions</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="d-grid gap-2">
+                                                <button class="btn btn-primary" onclick="showAdminTab('deposits')">
+                                                    <i class="fas fa-check me-2"></i>Review Deposits (${pendingDeposits})
+                                                </button>
+                                                <button class="btn btn-warning" onclick="showAdminTab('withdrawals')">
+                                                    <i class="fas fa-money-check me-2"></i>Process Withdrawals (${pendingWithdrawals})
+                                                </button>
+                                                <button class="btn btn-info" onclick="showAdminTab('users')">
+                                                    <i class="fas fa-users me-2"></i>Manage Users
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        break;
+                        
+                    case 'deposits':
+                        const allDeposits = depositsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                        content += `
+                            <div class="card">
+                                <div class="card-header">
+                                    <h4><i class="fas fa-money-bill-wave dashboard-icon"></i> Manage Deposits</h4>
+                                </div>
+                                <div class="card-body">
+                                    ${allDeposits.length ? `
+                                        <div class="table-responsive">
+                                            <table class="table transaction-table">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Date</th>
+                                                        <th>User</th>
+                                                        <th>Amount</th>
+                                                        <th>Transaction ID</th>
+                                                        <th>Status</th>
+                                                        <th>Actions</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    ${(await Promise.all(allDeposits.map(async deposit => {
+                                                        const userDoc = await db.collection('users').doc(deposit.userId).get();
+                                                        const userName = userDoc.exists ? userDoc.data().name : 'Unknown';
+                                                        return `
+                                                            <tr>
+                                                                <td>${new Date(deposit.date).toLocaleDateString()}</td>
+                                                                <td>${userName}</td>
+                                                                <td>Rs. ${deposit.amount.toFixed(2)}</td>
+                                                                <td>${deposit.transactionId}</td>
+                                                                <td>
+                                                                    <span class="badge bg-${deposit.status === 'approved' ? 'success' : deposit.status === 'pending' ? 'warning' : 'danger'}">
+                                                                        ${deposit.status}
+                                                                    </span>
+                                                                </td>
+                                                                <td>
+                                                                    ${deposit.status === 'pending' ? `
+                                                                        <button class="btn btn-sm btn-success me-1" onclick="approveDeposit('${deposit.id}', '${deposit.userId}', ${deposit.amount})">
+                                                                            <i class="fas fa-check"></i> Approve
+                                                                        </button>
+                                                                        <button class="btn btn-sm btn-danger" onclick="rejectDeposit('${deposit.id}')">
+                                                                            <i class="fas fa-times"></i> Reject
+                                                                        </button>
+                                                                    ` : `
+                                                                        <span class="text-muted">Processed</span>
+                                                                    `}
+                                                                </td>
+                                                            </tr>
+                                                        `;
+                                                    }))).join('')}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    ` : `
+                                        <div class="text-center py-4">
+                                            <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                                            <p>No deposits found</p>
+                                        </div>
+                                    `}
+                                </div>
+                            </div>
+                        `;
+                        break;
+                        
+                    case 'withdrawals':
+                        const allWithdrawals = withdrawalsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                        content += `
+                            <div class="card">
+                                <div class="card-header">
+                                    <h4><i class="fas fa-wallet dashboard-icon"></i> Manage Withdrawals</h4>
+                                </div>
+                                <div class="card-body">
+                                    ${allWithdrawals.length ? `
+                                        <div class="table-responsive">
+                                            <table class="table transaction-table">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Date</th>
+                                                        <th>User</th>
+                                                        <th>Amount</th>
+                                                        <th>Account</th>
+                                                        <th>Status</th>
+                                                        <th>Actions</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    ${(await Promise.all(allWithdrawals.map(async withdrawal => {
+                                                        const userDoc = await db.collection('users').doc(withdrawal.userId).get();
+                                                        const userName = userDoc.exists ? userDoc.data().name : 'Unknown';
+                                                        return `
+                                                            <tr>
+                                                                <td>${new Date(withdrawal.date).toLocaleDateString()}</td>
+                                                                <td>${userName}</td>
+                                                                <td>Rs. ${withdrawal.amount.toFixed(2)}</td>
+                                                                <td>${withdrawal.account}</td>
+                                                                <td>
+                                                                    <span class="badge bg-${withdrawal.status === 'approved' ? 'success' : withdrawal.status === 'pending' ? 'warning' : 'danger'}">
+                                                                        ${withdrawal.status}
+                                                                    </span>
+                                                                </td>
+                                                                <td>
+                                                                    ${withdrawal.status === 'pending' ? `
+                                                                        <button class="btn btn-sm btn-success me-1" onclick="approveWithdrawal('${withdrawal.id}', '${withdrawal.userId}', ${withdrawal.amount})">
+                                                                            <i class="fas fa-check"></i> Approve
+                                                                        </button>
+                                                                        <button class="btn btn-sm btn-danger" onclick="rejectWithdrawal('${withdrawal.id}')">
+                                                                            <i class="fas fa-times"></i> Reject
+                                                                        </button>
+                                                                    ` : `
+                                                                        <span class="text-muted">Processed</span>
+                                                                    `}
+                                                                </td>
+                                                            </tr>
+                                                        `;
+                                                    }))).join('')}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    ` : `
+                                        <div class="text-center py-4">
+                                            <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                                            <p>No withdrawals found</p>
+                                        </div>
+                                    `}
+                                </div>
+                            </div>
+                        `;
+                        break;
+                        
+                    case 'users':
+                        const allUsers = usersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                        content += `
+                            <div class="card">
+                                <div class="card-header">
+                                    <h4><i class="fas fa-users dashboard-icon"></i> Manage Users</h4>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table transaction-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Name</th>
+                                                    <th>Email</th>
+                                                    <th>Phone</th>
+                                                    <th>Balance</th>
+                                                    <th>Wallet</th>
+                                                    <th>Plan</th>
+                                                    <th>Verified</th>
+                                                    <th>Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                ${allUsers.filter(user => !user.isAdmin).map(user => `
+                                                    <tr>
+                                                        <td>${user.name}</td>
+                                                        <td>${user.email}</td>
+                                                        <td>${user.phone || 'N/A'}</td>
+                                                        <td>Rs. ${(user.balance || 0).toFixed(2)}</td>
+                                                        <td>Rs. ${(user.wallet || 0).toFixed(2)}</td>
+                                                        <td>
+                                                            <span class="badge bg-${user.plan_purchased ? 'success' : 'warning'}">
+                                                                ${user.plan_purchased ? 'Active' : 'Inactive'}
+                                                            </span>
+                                                        </td>
+                                                        <td>
+                                                            <span class="badge bg-${user.phoneVerified && user.emailVerified ? 'success' : 'warning'}">
+                                                                ${user.phoneVerified && user.emailVerified ? 'Verified' : 'Pending'}
+                                                            </span>
+                                                        </td>
+                                                        <td>
+                                                            <button class="btn btn-sm btn-outline-primary" onclick="viewUserDetails('${user.id}')">
+                                                                <i class="fas fa-eye"></i> View
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                `).join('')}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        break;
+                        
+                    case 'settings':
+                        content += `
+                            <div class="card">
+                                <div class="card-header">
+                                    <h4><i class="fas fa-cog dashboard-icon"></i> Admin Settings</h4>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h5>Platform Settings</h5>
+                                            <div class="mb-3">
+                                                <label class="form-label">Plan Price (Rs.)</label>
+                                                <input type="number" class="form-control" value="${PLAN_PRICE}" readonly>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Minimum Withdrawal (Rs.)</label>
+                                                <input type="number" class="form-control" value="${MIN_WITHDRAWAL}" readonly>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Commission Rate (%)</label>
+                                                <input type="number" class="form-control" value="${COMMISSION_RATE * 100}" readonly>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <h5>Admin Information</h5>
+                                            <div class="mb-3">
+                                                <label class="form-label">Admin JazzCash</label>
+                                                <input type="text" class="form-control" value="${ADMIN_JAZZCASH}" readonly>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Admin Name</label>
+                                                <input type="text" class="form-control" value="${ADMIN_NAME}" readonly>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Admin Email</label>
+                                                <input type="email" class="form-control" value="${ADMIN_EMAIL}" readonly>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="alert alert-info mt-3">
+                                        <h6>Note:</h6>
+                                        <p class="mb-0">Settings are currently read-only. To modify these values, update the constants in the code.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        break;
+                }
+                
+                document.getElementById("mainContent").innerHTML = content;
+                
+            } catch (error) {
+                console.error("Error loading admin dashboard:", error);
+                showNotification("Error loading admin dashboard: " + error.message, "danger");
+            }
+        }
+        
+        // Admin action functions
+        async function approveDeposit(depositId, userId, amount) {
+            try {
+                // Update deposit status
+                await db.collection('deposits').doc(depositId).update({
+                    status: 'approved'
+                });
+                
+                // Get user data
+                const userDoc = await db.collection('users').doc(userId).get();
+                const user = userDoc.data();
+                
+                // Add amount to user balance
+                await db.collection('users').doc(userId).update({
+                    balance: firebase.firestore.FieldValue.increment(amount)
+                });
+                
+                // If this is the first deposit and equals plan price, activate plan
+                if (!user.plan_purchased && amount >= PLAN_PRICE) {
+                    await db.collection('users').doc(userId).update({
+                        plan_purchased: true
+                    });
+                    
+                    // Give commission to referrer if exists
+                    if (user.referred_by) {
+                        const commission = amount * COMMISSION_RATE;
+                        
+                        await db.collection('users').doc(user.referred_by).update({
+                            wallet: firebase.firestore.FieldValue.increment(commission)
+                        });
+                        
+                        // Record commission in wallet history
+                        await db.collection('wallet_history').add({
+                            userId: user.referred_by,
+                            amount: commission,
+                            from_user: user.name,
+                            description: `Commission from ${user.name}'s deposit`,
+                            date: new Date().toISOString()
+                        });
+                    }
+                }
+                
+                showNotification("Deposit approved successfully!");
+                showAdminDashboard(); // Refresh the dashboard
+                
+            } catch (error) {
+                showNotification("Error approving deposit: " + error.message, "danger");
+            }
+        }
+        
+        async function rejectDeposit(depositId) {
+            try {
+                await db.collection('deposits').doc(depositId).update({
+                    status: 'rejected'
+                });
+                
+                showNotification("Deposit rejected successfully!");
+                showAdminDashboard(); // Refresh the dashboard
+                
+            } catch (error) {
+                showNotification("Error rejecting deposit: " + error.message, "danger");
+            }
+        }
+        
+        async function approveWithdrawal(withdrawalId, userId, amount) {
+            try {
+                // Update withdrawal status
+                await db.collection('withdrawals').doc(withdrawalId).update({
+                    status: 'approved'
+                });
+                
+                // Deduct amount from user wallet
+                await db.collection('users').doc(userId).update({
+                    wallet: firebase.firestore.FieldValue.increment(-amount)
+                });
+                
+                showNotification("Withdrawal approved successfully!");
+                showAdminDashboard(); // Refresh the dashboard
+                
+            } catch (error) {
+                showNotification("Error approving withdrawal: " + error.message, "danger");
+            }
+        }
+        
+        async function rejectWithdrawal(withdrawalId) {
+            try {
+                await db.collection('withdrawals').doc(withdrawalId).update({
+                    status: 'rejected'
+                });
+                
+                showNotification("Withdrawal rejected successfully!");
+                showAdminDashboard(); // Refresh the dashboard
+                
+            } catch (error) {
+                showNotification("Error rejecting withdrawal: " + error.message, "danger");
+            }
+        }
+        
+        async function viewUserDetails(userId) {
+            try {
+                const userDoc = await db.collection('users').doc(userId).get();
+                const user = userDoc.data();
+                
+                alert(`User Details:
+Name: ${user.name}
+Email: ${user.email}
+Phone: ${user.phone || 'N/A'}
+Balance: Rs. ${(user.balance || 0).toFixed(2)}
+Wallet: Rs. ${(user.wallet || 0).toFixed(2)}
+Plan: ${user.plan_purchased ? 'Active' : 'Inactive'}
+Phone Verified: ${user.phoneVerified ? 'Yes' : 'No'}
+Email Verified: ${user.emailVerified ? 'Yes' : 'No'}
+Referral Code: ${user.referral_code}
+JazzCash: ${user.jazzcash}`);
+                
+            } catch (error) {
+                showNotification("Error viewing user details: " + error.message, "danger");
+            }
+        }
+        
+        // Handle referral links
+        function handleReferralLink() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const refId = urlParams.get('ref');
+            if (refId) {
+                sessionStorage.setItem('referralId', refId);
+                showNotification("You were referred by someone! Register to earn together.", "info");
+            }
+        }
+        
         // Initialize the app
         document.addEventListener("DOMContentLoaded", async () => {
             try {
+                // Handle referral link first
+                handleReferralLink();
+                
                 // Initialize Firebase
                 document.getElementById("loadingMessage").textContent = "Initializing Firebase...";
                 
