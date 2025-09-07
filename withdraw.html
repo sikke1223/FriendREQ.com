@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MonkeyMoney - Withdraw Funds</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #ff9800;
+            --success: #22c55e;
+            --error: #ef4444;
+            --warning: #f59e0b;
+            --background: #f5f7fa;
+            --card-bg: #ffffff;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --gradient: linear-gradient(135deg, #2563eb 0%, #ff9800 100%);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--background) 0%, #e4edf5 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            color: var(--text);
+        }
+
+        .container {
+            max-width: 500px;
+            width: 100%;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            font-size: 32px;
+            font-weight: 800;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .logo i {
+            font-size: 28px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient);
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+            margin-bottom: 25px;
+            padding: 5px 0;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            transform: translateX(-3px);
+            color: var(--primary-dark);
+        }
+
+        h1 {
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: var(--text-light);
+            margin-bottom: 25px;
+            font-size: 16px;
+        }
+
+        .balance-info {
+            background: rgba(37, 99, 235, 0.05);
+            border: 1px solid rgba(37, 99, 235, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .balance-info h3 {
+            color: var(--primary);
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+
+        .balance-amount {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--text);
+            margin: 10px 0;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text);
+        }
+
+        input, select {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+        }
+
+        input.error, select.error {
+            border-color: var(--error);
+        }
+
+        .validation-message {
+            display: none;
+            color: var(--error);
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        .warning-box {
+            background: #fef3c7;
+            border: 1px solid #f59e0b;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            color: #92400e;
+        }
+
+        .warning-box i {
+            color: var(--warning);
+            margin-right: 8px;
+        }
+
+        button.submit-btn {
+            width: 100%;
+            padding: 16px;
+            background: var(--gradient);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+            box-shadow: 0 5px 15px rgba(37, 99, 235, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        button.submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 7px 20px rgba(37, 99, 235, 0.4);
+        }
+
+        button.submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .note {
+            background: #dcfce7;
+            border-left: 4px solid #22c55e;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 25px;
+            font-size: 14px;
+            color: #166534;
+        }
+
+        .note strong {
+            color: var(--success);
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transform: translateX(100%);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        .notification.success {
+            background: var(--success);
+        }
+
+        .notification.error {
+            background: var(--error);
+        }
+
+        .notification.warning {
+            background: var(--warning);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .card {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 24px;
+            }
+
+            .balance-amount {
+                font-size: 28px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">
+                <i class="fas fa-money-bill-wave"></i>
+                <div>MonkeyMoney</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <a href="dashboard.html" class="back-btn">
+                <i class="fas fa-arrow-left"></i>
+                Back to Dashboard
+            </a>
+
+            <h1>Withdraw Funds</h1>
+            <p class="subtitle">Withdraw money from your MonkeyMoney account</p>
+
+            <div class="balance-info">
+                <h3><i class="fas fa-wallet"></i> Available Balance</h3>
+                <div class="balance-amount" id="currentBalance">Rs. 0</div>
+                <p>You can withdraw any amount above Rs. 1,200</p>
+            </div>
+
+            <div class="warning-box">
+                <i class="fas fa-exclamation-triangle"></i>
+                <strong>Important:</strong> Withdrawal requests are processed within 24-48 hours. Minimum withdrawal amount is Rs. 1,200.
+            </div>
+
+            <form id="withdrawForm">
+                <div class="form-group">
+                    <label for="amount">Withdrawal Amount (Minimum Rs. 1,200)</label>
+                    <input type="number" id="amount" min="1200" placeholder="Enter withdrawal amount" required>
+                    <div class="validation-message" id="amountError">Minimum withdrawal amount is Rs. 1,200</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="method">Payment Method</label>
+                    <select id="method" required>
+                        <option value="">-- Select Payment Method --</option>
+                        <option value="JazzCash">JazzCash</option>
+                        <option value="EasyPaisa">EasyPaisa</option>
+                        <option value="BankTransfer">Bank Transfer</option>
+                    </select>
+                    <div class="validation-message" id="methodError">Please select a payment method</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="accountNumber">Account Number</label>
+                    <input type="text" id="accountNumber" placeholder="e.g., 03211234567 or Bank Account Number" required>
+                    <div class="validation-message" id="accountError">Please enter a valid account number</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="accountTitle">Account Title</label>
+                    <input type="text" id="accountTitle" placeholder="Enter account holder name" required>
+                    <div class="validation-message" id="titleError">Please enter account holder name</div>
+                </div>
+
+                <button type="submit" class="submit-btn">
+                    <i class="fas fa-paper-plane"></i>
+                    Submit Withdrawal Request
+                </button>
+
+                <div class="note">
+                    <strong>Processing Time:</strong> Withdrawal requests are typically processed within 24-48 hours during business days. You will receive a confirmation email once your request is approved.
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/storage.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/auth.js"></script>
+    
+    <script>
+        let currentUser = null;
+
+        // Check authentication and load user data
+        document.addEventListener('DOMContentLoaded', () => {
+            currentUser = getCurrentUser();
+            if (!currentUser) {
+                window.location.href = 'index.html';
+                return;
+            }
+            
+            // Update balance display
+            updateBalance();
+        });
+
+        function updateBalance() {
+            if (currentUser) {
+                // Get fresh user data
+                const users = getUsers();
+                const user = users.find(u => u.id === currentUser.id);
+                if (user) {
+                    currentUser = user;
+                    setCurrentUser(user);
+                }
+                document.getElementById('currentBalance').textContent = `Rs. ${formatCurrency(currentUser.balance || 0)}`;
+            }
+        }
+
+        // Form validation
+        function validateForm() {
+            let isValid = true;
+            
+            // Validate amount
+            const amount = parseFloat(document.getElementById('amount').value);
+            const amountError = document.getElementById('amountError');
+            
+            if (!amount || amount < 1200) {
+                amountError.textContent = 'Minimum withdrawal amount is Rs. 1,200';
+                amountError.style.display = 'block';
+                document.getElementById('amount').classList.add('error');
+                isValid = false;
+            } else if (amount > currentUser.balance) {
+                amountError.textContent = `Insufficient balance. Available: Rs. ${formatCurrency(currentUser.balance)}`;
+                amountError.style.display = 'block';
+                document.getElementById('amount').classList.add('error');
+                isValid = false;
+            } else {
+                amountError.style.display = 'none';
+                document.getElementById('amount').classList.remove('error');
+            }
+            
+            // Validate payment method
+            const method = document.getElementById('method').value;
+            const methodError = document.getElementById('methodError');
+            
+            if (!method) {
+                methodError.style.display = 'block';
+                document.getElementById('method').classList.add('error');
+                isValid = false;
+            } else {
+                methodError.style.display = 'none';
+                document.getElementById('method').classList.remove('error');
+            }
+            
+            // Validate account number
+            const accountNumber = document.getElementById('accountNumber').value.trim();
+            const accountError = document.getElementById('accountError');
+            
+            if (!accountNumber) {
+                accountError.style.display = 'block';
+                document.getElementById('accountNumber').classList.add('error');
+                isValid = false;
+            } else {
+                accountError.style.display = 'none';
+                document.getElementById('accountNumber').classList.remove('error');
+            }
+            
+            // Validate account title
+            const accountTitle = document.getElementById('accountTitle').value.trim();
+            const titleError = document.getElementById('titleError');
+            
+            if (!accountTitle) {
+                titleError.style.display = 'block';
+                document.getElementById('accountTitle').classList.add('error');
+                isValid = false;
+            } else {
+                titleError.style.display = 'none';
+                document.getElementById('accountTitle').classList.remove('error');
+            }
+            
+            return isValid;
+        }
+
+        // Handle form submission
+        document.getElementById('withdrawForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            if (!validateForm()) {
+                return;
+            }
+            
+            const submitBtn = document.querySelector('.submit-btn');
+            const originalText = submitBtn.innerHTML;
+            
+            try {
+                // Show loading state
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+                
+                const withdrawalData = {
+                    amount: parseFloat(document.getElementById('amount').value),
+                    method: document.getElementById('method').value,
+                    accountNumber: document.getElementById('accountNumber').value.trim(),
+                    accountTitle: document.getElementById('accountTitle').value.trim()
+                };
+                
+                // Submit withdrawal request
+                const withdrawal = requestWithdrawal(withdrawalData);
+                
+                // Update current user balance
+                updateBalance();
+                
+                // Show success message
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Withdrawal Request Submitted',
+                    html: `
+                        <div style="text-align: left;">
+                            <p><strong>Request ID:</strong> ${withdrawal.id.substring(0, 8)}...</p>
+                            <p><strong>Amount:</strong> Rs. ${formatCurrency(withdrawal.amount)}</p>
+                            <p><strong>Method:</strong> ${withdrawal.method}</p>
+                            <p><strong>Account:</strong> ${withdrawal.accountNumber}</p>
+                            <p><strong>Status:</strong> Pending Approval</p>
+                        </div>
+                        <div style="background: #f0f9ff; padding: 15px; border-radius: 8px; margin-top: 15px;">
+                            <strong>What happens next:</strong>
+                            <ol style="text-align: left; margin: 10px 0;">
+                                <li>Your balance has been debited temporarily</li>
+                                <li>Admin will review your request (24-48 hours)</li>
+                                <li>Funds will be transferred to your account upon approval</li>
+                                <li>If rejected, amount will be refunded to your balance</li>
+                            </ol>
+                        </div>
+                    `,
+                    confirmButtonText: 'Go to Dashboard'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = 'dashboard.html';
+                    }
+                });
+                
+                // Reset form
+                document.getElementById('withdrawForm').reset();
+                
+            } catch (error) {
+                console.error('Withdrawal request error:', error);
+                showNotification(error.message, 'error');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+            }
+        });
+
+        // Real-time validation
+        document.getElementById('amount').addEventListener('input', () => {
+            const amount = parseFloat(document.getElementById('amount').value);
+            const amountError = document.getElementById('amountError');
+            
+            if (amount && amount >= 1200 && amount <= currentUser.balance) {
+                amountError.style.display = 'none';
+                document.getElementById('amount').classList.remove('error');
+            }
+        });
+
+        document.getElementById('method').addEventListener('change', () => {
+            const method = document.getElementById('method').value;
+            const methodError = document.getElementById('methodError');
+            
+            if (method) {
+                methodError.style.display = 'none';
+                document.getElementById('method').classList.remove('error');
+            }
+        });
+
+        document.getElementById('accountNumber').addEventListener('input', () => {
+            const accountNumber = document.getElementById('accountNumber').value.trim();
+            const accountError = document.getElementById('accountError');
+            
+            if (accountNumber) {
+                accountError.style.display = 'none';
+                document.getElementById('accountNumber').classList.remove('error');
+            }
+        });
+
+        document.getElementById('accountTitle').addEventListener('input', () => {
+            const accountTitle = document.getElementById('accountTitle').value.trim();
+            const titleError = document.getElementById('titleError');
+            
+            if (accountTitle) {
+                titleError.style.display = 'none';
+                document.getElementById('accountTitle').classList.remove('error');
+            }
+        });
+    </script>
+</body>
+</html>

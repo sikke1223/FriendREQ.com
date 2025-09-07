@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MonkeyMoney - Secure Deposit</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #ff9800;
+            --success: #22c55e;
+            --error: #ef4444;
+            --background: #f5f7fa;
+            --card-bg: #ffffff;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --gradient: linear-gradient(135deg, #2563eb 0%, #ff9800 100%);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--background) 0%, #e4edf5 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            color: var(--text);
+        }
+
+        .container {
+            max-width: 500px;
+            width: 100%;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            font-size: 32px;
+            font-weight: 800;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .logo i {
+            font-size: 28px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient);
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+            margin-bottom: 25px;
+            padding: 5px 0;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            transform: translateX(-3px);
+            color: var(--primary-dark);
+        }
+
+        h1 {
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: var(--text-light);
+            margin-bottom: 25px;
+            font-size: 16px;
+        }
+
+        .payment-option {
+            display: flex;
+            align-items: center;
+            padding: 18px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .payment-option:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .payment-option.selected {
+            border-color: var(--primary);
+            background: #f0f7ff;
+            box-shadow: 0 5px 15px rgba(37, 99, 235, 0.1);
+        }
+
+        .payment-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+            font-size: 24px;
+            color: var(--primary);
+        }
+
+        .payment-info h3 {
+            margin: 0;
+            font-size: 18px;
+            color: var(--text);
+        }
+
+        .payment-info p {
+            margin: 5px 0 0;
+            color: var(--text-light);
+            font-size: 14px;
+        }
+
+        .payment-info strong {
+            color: var(--primary);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text);
+        }
+
+        input, select {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+        }
+
+        input.error {
+            border-color: var(--error);
+        }
+
+        .validation-message {
+            display: none;
+            color: var(--error);
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        button.submit-btn {
+            width: 100%;
+            padding: 16px;
+            background: var(--gradient);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+            box-shadow: 0 5px 15px rgba(37, 99, 235, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        button.submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 7px 20px rgba(37, 99, 235, 0.4);
+        }
+
+        button.submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .note {
+            background: #fff9db;
+            border-left: 4px solid #ffd43b;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 25px;
+            font-size: 14px;
+            color: #5f3e00;
+        }
+
+        .note strong {
+            color: #d97706;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transform: translateX(100%);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        .notification.success {
+            background: var(--success);
+        }
+
+        .notification.error {
+            background: var(--error);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .card {
+                padding: 20px;
+            }
+            
+            .payment-option {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .payment-icon {
+                margin-right: 0;
+                margin-bottom: 10px;
+            }
+            
+            h1 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">
+                <i class="fas fa-coins"></i>
+                <div>MonkeyMoney</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <a href="dashboard.html" class="back-btn">
+                <i class="fas fa-arrow-left"></i>
+                Back to Dashboard
+            </a>
+
+            <h1>Secure Deposit</h1>
+            <p class="subtitle">Add funds to your MonkeyMoney account</p>
+
+            <form id="depositForm">
+                <div class="form-group">
+                    <label for="amount">Amount (Minimum Rs. 500)</label>
+                    <input type="number" id="amount" min="500" placeholder="Enter amount" required>
+                    <div class="validation-message" id="amountError">Minimum deposit amount is Rs. 500</div>
+                </div>
+
+                <div class="form-group">
+                    <label>Select Payment Method</label>
+                    
+                    <div class="payment-option" data-method="JazzCash">
+                        <div class="payment-icon">
+                            <i class="fas fa-mobile-alt"></i>
+                        </div>
+                        <div class="payment-info">
+                            <h3>JazzCash</h3>
+                            <p>Mobile wallet payment via <strong>JazzCash</strong></p>
+                        </div>
+                    </div>
+
+                    <div class="payment-option" data-method="EasyPaisa">
+                        <div class="payment-icon">
+                            <i class="fas fa-credit-card"></i>
+                        </div>
+                        <div class="payment-info">
+                            <h3>EasyPaisa</h3>
+                            <p>Digital payment via <strong>EasyPaisa</strong></p>
+                        </div>
+                    </div>
+
+                    <div class="payment-option" data-method="BankTransfer">
+                        <div class="payment-icon">
+                            <i class="fas fa-university"></i>
+                        </div>
+                        <div class="payment-info">
+                            <h3>Bank Transfer</h3>
+                            <p>Direct bank transfer to our account</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="accountNumber">Your Account Number</label>
+                    <input type="text" id="accountNumber" placeholder="e.g., 03211234567" required>
+                    <div class="validation-message" id="accountError">Please enter a valid account number</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="transactionId">Transaction ID (Optional)</label>
+                    <input type="text" id="transactionId" placeholder="Enter transaction reference ID">
+                </div>
+
+                <button type="submit" class="submit-btn">
+                    <i class="fas fa-credit-card"></i>
+                    Submit Deposit Request
+                </button>
+
+                <div class="note">
+                    <strong>Important:</strong> After submitting your deposit request, please transfer the exact amount to our designated account. Your deposit will be processed within 24 hours after verification.
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/storage.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/auth.js"></script>
+    
+    <script>
+        let selectedMethod = '';
+
+        // Check authentication
+        document.addEventListener('DOMContentLoaded', () => {
+            const currentUser = getCurrentUser();
+            if (!currentUser) {
+                window.location.href = 'index.html';
+                return;
+            }
+        });
+
+        // Payment method selection
+        document.querySelectorAll('.payment-option').forEach(option => {
+            option.addEventListener('click', () => {
+                // Remove selected class from all options
+                document.querySelectorAll('.payment-option').forEach(opt => {
+                    opt.classList.remove('selected');
+                });
+                
+                // Add selected class to clicked option
+                option.classList.add('selected');
+                selectedMethod = option.dataset.method;
+            });
+        });
+
+        // Form validation
+        function validateForm() {
+            let isValid = true;
+            
+            // Validate amount
+            const amount = parseFloat(document.getElementById('amount').value);
+            const amountError = document.getElementById('amountError');
+            
+            if (!amount || amount < 500) {
+                amountError.style.display = 'block';
+                document.getElementById('amount').classList.add('error');
+                isValid = false;
+            } else {
+                amountError.style.display = 'none';
+                document.getElementById('amount').classList.remove('error');
+            }
+            
+            // Validate payment method
+            if (!selectedMethod) {
+                showNotification('Please select a payment method', 'error');
+                isValid = false;
+            }
+            
+            // Validate account number
+            const accountNumber = document.getElementById('accountNumber').value.trim();
+            const accountError = document.getElementById('accountError');
+            
+            if (!accountNumber) {
+                accountError.style.display = 'block';
+                document.getElementById('accountNumber').classList.add('error');
+                isValid = false;
+            } else {
+                accountError.style.display = 'none';
+                document.getElementById('accountNumber').classList.remove('error');
+            }
+            
+            return isValid;
+        }
+
+        // Handle form submission
+        document.getElementById('depositForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            if (!validateForm()) {
+                return;
+            }
+            
+            const submitBtn = document.querySelector('.submit-btn');
+            const originalText = submitBtn.innerHTML;
+            
+            try {
+                // Show loading state
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+                
+                const depositData = {
+                    amount: parseFloat(document.getElementById('amount').value),
+                    method: selectedMethod,
+                    accountNumber: document.getElementById('accountNumber').value.trim(),
+                    transactionId: document.getElementById('transactionId').value.trim() || null
+                };
+                
+                // Submit deposit request
+                const deposit = requestDeposit(depositData);
+                
+                // Show success message
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Deposit Request Submitted',
+                    html: `
+                        <div style="text-align: left;">
+                            <p><strong>Request ID:</strong> ${deposit.id.substring(0, 8)}...</p>
+                            <p><strong>Amount:</strong> Rs. ${formatCurrency(deposit.amount)}</p>
+                            <p><strong>Method:</strong> ${deposit.method}</p>
+                            <p><strong>Status:</strong> Pending Approval</p>
+                        </div>
+                        <div style="background: #f0f9ff; padding: 15px; border-radius: 8px; margin-top: 15px;">
+                            <strong>Next Steps:</strong>
+                            <ol style="text-align: left; margin: 10px 0;">
+                                <li>Transfer Rs. ${formatCurrency(deposit.amount)} to our ${deposit.method} account</li>
+                                <li>Keep your transaction receipt</li>
+                                <li>Wait for admin approval (24-48 hours)</li>
+                            </ol>
+                        </div>
+                    `,
+                    confirmButtonText: 'Go to Dashboard'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = 'dashboard.html';
+                    }
+                });
+                
+                // Reset form
+                document.getElementById('depositForm').reset();
+                document.querySelectorAll('.payment-option').forEach(opt => {
+                    opt.classList.remove('selected');
+                });
+                selectedMethod = '';
+                
+            } catch (error) {
+                console.error('Deposit request error:', error);
+                showNotification(error.message, 'error');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+            }
+        });
+
+        // Real-time validation
+        document.getElementById('amount').addEventListener('input', () => {
+            const amount = parseFloat(document.getElementById('amount').value);
+            const amountError = document.getElementById('amountError');
+            
+            if (amount && amount >= 500) {
+                amountError.style.display = 'none';
+                document.getElementById('amount').classList.remove('error');
+            }
+        });
+
+        document.getElementById('accountNumber').addEventListener('input', () => {
+            const accountNumber = document.getElementById('accountNumber').value.trim();
+            const accountError = document.getElementById('accountError');
+            
+            if (accountNumber) {
+                accountError.style.display = 'none';
+                document.getElementById('accountNumber').classList.remove('error');
+            }
+        });
+    </script>
+</body>
+</html>
