@@ -1,309 +1,246 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MonkeyMoney - Login</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <style>
-    :root {
-      --primary: #2563eb;
-      --primary-dark: #1d4ed8;
-      --secondary: #ff9800;
-      --success: #22c55e;
-      --error: #ef4444;
-      --background: #f5f7fa;
-      --card-bg: #ffffff;
-      --text: #1e293b;
-      --text-light: #64748b;
-    }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-
-    body {
-      background: linear-gradient(135deg, var(--background) 0%, #e4edf5 100%);
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 20px;
-      color: var(--text);
-    }
-
-    .login-container {
-      background: var(--card-bg);
-      padding: 40px;
-      border-radius: 16px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-      width: 100%;
-      max-width: 450px;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .login-container::before {
-      content: "";
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 4px;
-      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-    }
-
-    .logo {
-      text-align: center;
-      margin-bottom: 30px;
-    }
-
-    .logo h1 {
-      font-size: 32px;
-      color: var(--primary);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-      margin-bottom: 5px;
-    }
-
-    .logo i {
-      font-size: 36px;
-      color: var(--secondary);
-    }
-
-    .logo p {
-      color: var(--text-light);
-      font-size: 16px;
-    }
-
-    .form-group {
-      margin-bottom: 20px;
-    }
-
-    .form-group label {
-      display: block;
-      margin-bottom: 8px;
-      font-weight: 500;
-      color: var(--text);
-    }
-
-    .form-group input {
-      width: 100%;
-      padding: 14px 18px;
-      border: 2px solid #e2e8f0;
-      border-radius: 10px;
-      font-size: 16px;
-      transition: all 0.3s;
-      background: #f8fafc;
-    }
-
-    .form-group input:focus {
-      border-color: var(--primary);
-      outline: none;
-      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
-      background: white;
-    }
-
-    .btn {
-      width: 100%;
-      padding: 16px;
-      border: none;
-      border-radius: 10px;
-      font-size: 16px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s;
-      margin-bottom: 15px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-    }
-
-    .btn-primary {
-      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-      color: white;
-      box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
-    }
-
-    .btn-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
-    }
-
-    .btn-admin {
-      background: linear-gradient(135deg, var(--secondary) 0%, #e68900 100%);
-      color: white;
-      box-shadow: 0 4px 15px rgba(255, 152, 0, 0.3);
-    }
-
-    .btn-admin:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(255, 152, 0, 0.4);
-    }
-
-    .links {
-      text-align: center;
-      margin-top: 25px;
-      padding-top: 20px;
-      border-top: 1px solid #e2e8f0;
-    }
-
-    .links a {
-      color: var(--primary);
-      text-decoration: none;
-      font-weight: 500;
-      margin: 0 10px;
-      transition: color 0.3s;
-    }
-
-    .links a:hover {
-      color: var(--primary-dark);
-    }
-
-    .loading {
-      display: none;
-      text-align: center;
-      color: var(--primary);
-      margin: 20px 0;
-    }
-
-    .notification {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      padding: 15px 25px;
-      border-radius: 8px;
-      color: white;
-      font-weight: 500;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      z-index: 1000;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      transform: translateX(100%);
-      opacity: 0;
-      transition: all 0.3s ease;
-    }
-
-    .notification.show {
-      transform: translateX(0);
-      opacity: 1;
-    }
-
-    .notification.success {
-      background: var(--success);
-    }
-
-    .notification.error {
-      background: var(--error);
-    }
-
-    .notification.warning {
-      background: var(--secondary);
-    }
-
-    @media (max-width: 480px) {
-      .login-container {
-        padding: 30px 20px;
-      }
-      
-      .logo h1 {
-        font-size: 28px;
-      }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sikander Hayat - Professional Business Card</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', 'Segoe UI', sans-serif;
+        }
+        
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0a192f 0%, #172a45 100%);
+            padding: 20px;
+        }
+        
+        .business-card {
+            width: 100%;
+            max-width: 900px;
+            background: #0a192f;
+            color: #e6f1ff;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #64ffda33;
+        }
+        
+        .card-header {
+            background: rgba(23, 42, 69, 0.5);
+            padding: 30px;
+            text-align: center;
+            border-bottom: 1px solid #64ffda33;
+        }
+        
+        .name {
+            font-size: 2.8rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+            color: #e6f1ff;
+            letter-spacing: 1px;
+        }
+        
+        .title {
+            font-size: 1.6rem;
+            font-weight: 300;
+            margin-bottom: 15px;
+            color: #64ffda;
+        }
+        
+        .tagline {
+            font-style: italic;
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+            color: #a8b2d1;
+        }
+        
+        .card-content {
+            padding: 30px;
+            display: flex;
+            flex-wrap: wrap;
+        }
+        
+        .left-column {
+            flex: 1;
+            min-width: 300px;
+            padding-right: 30px;
+        }
+        
+        .right-column {
+            flex: 1;
+            min-width: 300px;
+            border-left: 1px solid #64ffda33;
+            padding-left: 30px;
+        }
+        
+        .section-title {
+            color: #64ffda;
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #64ffda;
+            display: inline-block;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .expertise-list {
+            list-style-type: none;
+            margin-bottom: 30px;
+        }
+        
+        .expertise-list li {
+            padding: 10px 0;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #64ffda15;
+        }
+        
+        .expertise-list i {
+            color: #64ffda;
+            margin-right: 15px;
+            font-size: 1.4rem;
+            width: 30px;
+            text-align: center;
+        }
+        
+        .contact-info {
+            list-style-type: none;
+            margin-bottom: 30px;
+        }
+        
+        .contact-info li {
+            padding: 12px 0;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .contact-info i {
+            color: #64ffda;
+            margin-right: 15px;
+            font-size: 1.4rem;
+            width: 30px;
+            text-align: center;
+        }
+        
+        .services-list {
+            list-style-type: none;
+        }
+        
+        .services-list li {
+            padding: 12px 0;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #64ffda15;
+        }
+        
+        .services-list i {
+            color: #64ffda;
+            margin-right: 15px;
+            font-size: 1.4rem;
+            width: 30px;
+            text-align: center;
+        }
+        
+        .cta {
+            background: rgba(100, 255, 218, 0.1);
+            text-align: center;
+            padding: 25px;
+            font-size: 1.3rem;
+            color: #64ffda;
+            font-weight: 500;
+            border-top: 1px solid #64ffda33;
+        }
+        
+        .logo {
+            color: #64ffda;
+            font-size: 1.2rem;
+            letter-spacing: 3px;
+            margin-top: 10px;
+            font-weight: 300;
+        }
+        
+        @media (max-width: 768px) {
+            .card-content {
+                flex-direction: column;
+            }
+            
+            .left-column {
+                padding-right: 0;
+            }
+            
+            .right-column {
+                border-left: none;
+                border-top: 1px solid #64ffda33;
+                padding-left: 0;
+                padding-top: 30px;
+                margin-top: 30px;
+            }
+            
+            .name {
+                font-size: 2.2rem;
+            }
+            
+            .title {
+                font-size: 1.3rem;
+            }
+        }
+    </style>
 </head>
 <body>
-  <div class="login-container">
-    <div class="logo">
-      <h1>
-        <i class="fas fa-coins"></i>
-        MonkeyMoney
-      </h1>
-      <p>Your Gateway to Financial Success</p>
+    <div class="business-card">
+        <div class="card-header">
+            <h1 class="name">Sikander Hayat</h1>
+            <h2 class="title">Front-End Web Developer</h2>
+            <p class="tagline">Crafting Ideas Into Interactive Reality</p>
+            <div class="logo">CODE • DESIGN • CREATE</div>
+        </div>
+        
+        <div class="card-content">
+            <div class="left-column">
+                <h3 class="section-title">Expertise</h3>
+                <ul class="expertise-list">
+                    <li><i class="fab fa-html5"></i> HTML5</li>
+                    <li><i class="fab fa-css3-alt"></i> CSS3</li>
+                    <li><i class="fab fa-js"></i> JavaScript</li>
+                    <li><i class="fab fa-react"></i> React.js</li>
+                    <li><i class="fas fa-mobile-alt"></i> Responsive Design</li>
+                </ul>
+                
+                <h3 class="section-title">Contact</h3>
+                <ul class="contact-info">
+                    <li><i class="fas fa-phone"></i> +92 329 7487063</li>
+                    <li><i class="fas fa-envelope"></i> versesofn@gmail.com</li>
+                </ul>
+            </div>
+            
+            <div class="right-column">
+                <h3 class="section-title">My Services</h3>
+                <ul class="services-list">
+                    <li><i class="fas fa-laptop-code"></i> Modern Website Development</li>
+                    <li><i class="fas fa-paint-brush"></i> Responsive UI/UX Implementation</li>
+                    <li><i class="fas fa-window-restore"></i> Single Page Applications (SPA)</li>
+                    <li><i class="fas fa-tools"></i> Website Maintenance & Optimization</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="cta">
+            Let's Connect & Build Something Amazing!
+        </div>
     </div>
-
-    <form id="loginForm">
-      <div class="form-group">
-        <label for="email">Email Address</label>
-        <input type="email" id="email" placeholder="Enter your email" required>
-      </div>
-      
-      <div class="form-group">
-        <label for="password">Password</label>
-        <input type="password" id="password" placeholder="Enter your password" required>
-      </div>
-      
-      <button type="submit" class="btn btn-primary">
-        <i class="fas fa-sign-in-alt"></i>
-        Login to Dashboard
-      </button>
-    </form>
-
-    <button class="btn btn-admin" onclick="window.location.href='admin.html'">
-      <i class="fas fa-user-shield"></i>
-      Admin Panel
-    </button>
-
-    <div class="loading" id="loading">
-      <i class="fas fa-spinner fa-spin"></i>
-      Signing you in...
-    </div>
-
-    <div class="links">
-      <a href="register.html">
-        <i class="fas fa-user-plus"></i>
-        Create Account
-      </a>
-      <a href="forget-password.html">
-        <i class="fas fa-key"></i>
-        Forgot Password?
-      </a>
-    </div>
-  </div>
-
-  <!-- App Scripts -->
-  <script src="js/storage.js"></script>
-  <script src="js/utils.js"></script>
-  <script src="js/auth.js"></script>
-  
-  <script>
-    // Handle login form
-    document.getElementById("loginForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
-      const loadingEl = document.getElementById("loading");
-      const submitBtn = e.target.querySelector('button[type="submit"]');
-      
-      // Show loading state
-      loadingEl.style.display = "block";
-      submitBtn.disabled = true;
-      
-      try {
-        await loginUser(email, password);
-      } catch (error) {
-        showNotification(error.message, 'error');
-      } finally {
-        loadingEl.style.display = "none";
-        submitBtn.disabled = false;
-      }
-    });
-
-    // Check if user is already logged in
-    document.addEventListener('DOMContentLoaded', () => {
-      const currentUser = getCurrentUser();
-      if (currentUser) {
-        window.location.href = 'dashboard.html';
-      }
-    });
-  </script>
 </body>
 </html>
